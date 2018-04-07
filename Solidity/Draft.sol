@@ -97,7 +97,7 @@ contract DigiCoin is IERC20 {
   * @dev Constructor for DigiCoin
   * @dev Assigns the totalSupply to the DIGBorks contract
   */
-  function Cryptowroks(address _cryptDistributionContractAddress) public {
+  function DigiCoin(address _cryptDistributionContractAddress) public {
     require(_cryptDistributionContractAddress != address(0));
     balances[_cryptDistributionContractAddress] = totalSupply;
     Transfer(address(0), _cryptDistributionContractAddress, totalSupply);
