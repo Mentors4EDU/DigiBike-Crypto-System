@@ -80,7 +80,19 @@ Please note part of this smart contract forks PolyMathNetwork's airdrop function
  */
 contract DigiCoin is IERC20 {
   using SafeMath for uint256;
-
+  address public owner;
+    function Ownable() {
+        owner = msg.sender;
+    }
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+    function transferOwnership(address newOwner) onlyOwner {
+        if (newOwner != address(0)) {
+            owner = newOwner;
+        }
+    }
   // DigiCoin parameters
   string public name = 'DigiCoin';
   string public symbol = 'DIGB';
@@ -92,16 +104,6 @@ contract DigiCoin is IERC20 {
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
-
-  /**
-  * @dev Constructor for DigiCoin
-  * @dev Assigns the totalSupply to the DIGBorks contract
-  */
-  function DigiCoin(address _cryptDistributionContractAddress) public {
-    require(_cryptDistributionContractAddress != address(0));
-    balances[_cryptDistributionContractAddress] = totalSupply;
-    Transfer(address(0), _cryptDistributionContractAddress, totalSupply);
-  }
 
   /**
   * @dev Gets the balance of the specified address.
@@ -306,10 +308,8 @@ contract DigiCoinDistribution is Ownable {
   modifier onlyOwnerOrAdmin() {
     _;
   }
-
   event LogNewAllocation(address indexed _recipient, AllocationType indexed _fromSupply, uint256 _totalAllocated, uint256 _grandTotalAllocated);
   event LogDIGBClaimed(address indexed _recipient, uint8 indexed _fromSupply, uint256 _amountClaimed, uint256 _totalAllocated, uint256 _grandTotalClaimed);
-
   /**
     * @dev Constructor function - Set the DigiCoin address
     */
@@ -318,7 +318,6 @@ contract DigiCoinDistribution is Ownable {
     require(AVAILABLE_TOTAL_SUPPLY == AVAILABLE_PRESALE_SUPPLY.add(AVAILABLE_FOUNDER_SUPPLY).add(AVAILABLE_AIRDROP_SUPPLY).add(AVAILABLE_ADVISOR_SUPPLY).add(AVAILABLE_BONUS1_SUPPLY).add(AVAILABLE_BONUS2_SUPPLY).add(AVAILABLE_BONUS3_SUPPLY).add(AVAILABLE_RESERVE_SUPPLY));
     startTime = _startTime;
   }
-
   /**
     * @dev Allow the owner of the contract to assign a new allocation
     * @param _recipient The recipient of the allocation
@@ -394,7 +393,6 @@ contract DigiCoinDistribution is Ownable {
     require(DIGB.transfer(_recipient, tokensToTransfer));
     grandTotalClaimed = grandTotalClaimed.add(tokensToTransfer);
   }
-
   // Returns the amount of DIGB allocated
   function grandTotalAllocated() public view returns (uint256) {
     return INITIAL_SUPPLY - AVAILABLE_TOTAL_SUPPLY;
